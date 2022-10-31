@@ -47,6 +47,7 @@ extension EditingViewController {
         }
         
         let nameField = Resources.NameFields.allCases[indexPath.row].rawValue
+        cell.nameTextViewDelegate = self
         cell.configure(name: nameField)
         return cell
     }
@@ -57,4 +58,14 @@ extension EditingViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         indexPath.row == 1 ? UITableView.automaticDimension : 44
     }
+}
+
+extension EditingViewController: NameTextViewProtocol {
+    
+    func changeSize() {
+        tableView.beginUpdates()
+        
+        tableView.endUpdates()
+    }
+    
 }

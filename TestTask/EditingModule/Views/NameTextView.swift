@@ -22,5 +22,7 @@ class NameTextView: UITextView {
         text = "Введите данные"
         textColor = .lightGray
         textAlignment = .right
+        font = Resources.Fonts.avenirNextRegular(with: 18)
+        isScrollEnabled = false
     }
 }

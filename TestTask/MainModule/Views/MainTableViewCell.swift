@@ -17,6 +17,7 @@ final class MainTableViewCell: UITableViewCell {
         let label = UILabel()
         label.textAlignment = .right
         label.text = "Test"
+        label.font = Resources.Fonts.avenirNextRegular(with: 18)
         label.numberOfLines = 0
         return label
     }()
@@ -34,6 +35,8 @@ final class MainTableViewCell: UITableViewCell {
     
     private func setupViews() {
         selectionStyle = .none
+        nameLabel.font = Resources.Fonts.avenirNextRegular(with: 18)
+        
         addView(nameLabel)
         addView(valueLabel)
         setConstraints()
