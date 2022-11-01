@@ -42,29 +42,14 @@ final class TextViewTableViewCell: UITableViewCell {
         nameTextView.delegate = self
     }
     
-    public func configure(name: String) {
+    public func configure(name: String, scrollEnable: Bool) {
         nameLabel.text = name
+        nameTextView.isScrollEnabled = scrollEnable
     }
     
 }
 
-extension TextViewTableViewCell {
-    
-    private func setConstraints() {
-        NSLayoutConstraint.activate([
-            nameLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-            nameLabel.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35),
-            
-            nameTextView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
-            nameTextView.leadingAnchor.constraint(equalTo: nameLabel.trailingAnchor, constant: 10),
-            nameTextView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-            nameTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)
-        ])
-    }
-    
-}
-
+// MARK: - UITextViewDelegate
 extension TextViewTableViewCell: UITextViewDelegate {
     
     func textViewDidChange(_ textView: UITextView) {
@@ -84,6 +69,24 @@ extension TextViewTableViewCell: UITextViewDelegate {
             textView.text = "Введите данные"
             textView.textColor = .lightGray
         }
+    }
+    
+}
+
+// MARK: - setConstraints
+extension TextViewTableViewCell {
+    
+    private func setConstraints() {
+        NSLayoutConstraint.activate([
+            nameLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+            nameLabel.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.35),
+            
+            nameTextView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
+            nameTextView.leadingAnchor.constraint(equalTo: nameLabel.trailingAnchor, constant: 10),
+            nameTextView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+//            nameTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)
+        ])
     }
     
 }
