@@ -7,15 +7,26 @@
 
 import UIKit
 
-final class EditingViewController: UITableViewController {
+final class EditingViewController: UIViewController {
+    
+    private let editingTableView = EditingTableView()
+    private var userModel: UserModel
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupViews()
-        tableView.register(TextViewTableViewCell.self, forCellReuseIdentifier: TextViewTableViewCell.identifier)
-        tableView.register(DatePickerTableViewCell.self, forCellReuseIdentifier: DatePickerTableViewCell.identifier)
-        tableView.register(PickerViewTableViewCell.self, forCellReuseIdentifier: PickerViewTableViewCell.identifier)
+        setConstraints()
+        print(userModel)
+    }
+    
+    init(_ userModel: UserModel) {
+        self.userModel = userModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private func setupViews() {
@@ -26,77 +37,57 @@ final class EditingViewController: UITableViewController {
             title: "Сохранить",
             style: .plain,
             target: self,
-            action: #selector(editingTapped)
+            action: #selector(saveTapped)
         )
-    }
-
-    @objc private func editingTapped() {
-        print("Tapped test")
-    }
-
-}
-
-extension EditingViewController {
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        Resources.NameFields.allCases.count
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let nameField = Resources.NameFields.allCases[indexPath.row].rawValue
         
-        switch indexPath.row {
-        case 0...2:
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: TextViewTableViewCell.identifier,
-                                                           for: indexPath) as? TextViewTableViewCell else {
-                return UITableViewCell()
-            }
-            cell.nameTextViewDelegate = self
-            if indexPath.row == 1 {
-                cell.configure(name: nameField, scrollEnable: false)
+        let backBarButtonItem = UIBarButtonItem.createCustomButton(vc: self, selector: #selector(backButtonTapped))
+        navigationItem.leftBarButtonItem = backBarButtonItem
+        view.addView(editingTableView)
+    }
+
+    @objc private func saveTapped() {
+        if authFields() {
+            presentSimpleAlert(title: "Saving was successful", message: "Success")
+        } else {
+            presentSimpleAlert(title: "Saving error", message: "Enter all required data")
+        }
+    }
+    
+    @objc private func backButtonTapped() {
+        presentChangeAlert { value in
+            if value {
+                // TODO: send model
+                self.navigationController?.popViewController(animated: true)
             } else {
-                cell.configure(name: nameField, scrollEnable: true)
+                self.navigationController?.popViewController(animated: true)
             }
-            return cell
-        case 3:
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: DatePickerTableViewCell.identifier,
-                                                           for: indexPath) as? DatePickerTableViewCell else {
-                return UITableViewCell()
-            }
-            cell.configure(name: nameField)
-            
-            return cell
-        case 4:
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: PickerViewTableViewCell.identifier,
-                                                           for: indexPath) as? PickerViewTableViewCell else {
-                return UITableViewCell()
-            }
-            cell.configure(name: nameField)
-            
-            return cell
-        default:
-            return UITableViewCell()
+        }
+    }
+    
+    private func authFields() -> Bool {
+        if userModel.firstName != "" ||
+            userModel.secondName != "" ||
+            userModel.dateOfBirth != "" ||
+            userModel.gender != "" {
+            return true
         }
         
-        
+        return false
     }
+
 }
+
+// MARK: - setConstraints
 
 extension EditingViewController {
     
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        indexPath.row == 1 ? UITableView.automaticDimension : 44
-    }
-}
-
-// MARK: - NameTextViewProtocol
-
-extension EditingViewController: NameTextViewProtocol {
-    
-    func changeSize() {
-        tableView.beginUpdates()
-        
-        tableView.endUpdates()
+    private func setConstraints() {
+        NSLayoutConstraint.activate([
+            editingTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+            editingTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            editingTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+            editingTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
+        ])
     }
     
 }
