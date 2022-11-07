@@ -9,6 +9,13 @@ import UIKit
 
 final class MainViewController: UIViewController {
     
+    private let userPhotoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.backgroundColor = .gray
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
     private let mainTableView = MainTableView()
     
     private var userModel = UserModel()
@@ -21,6 +28,10 @@ final class MainViewController: UIViewController {
         setValueArray()
     }
     
+    override func viewWillLayoutSubviews() {
+        userPhotoImageView.layer.cornerRadius = userPhotoImageView.frame.width / 2
+    }
+    
     private func setupViews() {
         title = "Просмотр"
         view.backgroundColor = .white
@@ -31,6 +42,7 @@ final class MainViewController: UIViewController {
             target: self,
             action: #selector(editingTapped)
         )
+        view.addView(userPhotoImageView)
         view.addView(mainTableView)
     }
 
@@ -72,7 +84,6 @@ final class MainViewController: UIViewController {
         
         userModel = model
         setValueArray()
-//        mainTableView.reloadData()
     }
 
 }
@@ -83,7 +94,12 @@ extension MainViewController {
     
     private func setConstraints() {
         NSLayoutConstraint.activate([
-            mainTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+            userPhotoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            userPhotoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            userPhotoImageView.heightAnchor.constraint(equalToConstant: 100),
+            userPhotoImageView.widthAnchor.constraint(equalToConstant: 100),
+            
+            mainTableView.topAnchor.constraint(equalTo: userPhotoImageView.bottomAnchor, constant: 10),
             mainTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
             mainTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
             mainTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
