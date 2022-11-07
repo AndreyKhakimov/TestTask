@@ -7,15 +7,18 @@
 
 import UIKit
 
-final class MainViewController: UITableViewController {
+final class MainViewController: UIViewController {
+    
+    private let mainTableView = MainTableView()
     
     private var userModel = UserModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
+        setConstraints()
         getUserModel()
-        tableView.register(MainTableViewCell.self, forCellReuseIdentifier: MainTableViewCell.identifier)
+        setValueArray()
     }
     
     private func setupViews() {
@@ -28,6 +31,7 @@ final class MainViewController: UITableViewController {
             target: self,
             action: #selector(editingTapped)
         )
+        view.addView(mainTableView)
     }
 
     @objc private func editingTapped() {
@@ -38,30 +42,52 @@ final class MainViewController: UITableViewController {
     private func getUserModel() {
         userModel = UserDefaultsHelper.getUserModel()
     }
-
-}
-
-extension MainViewController {
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        Resources.NameFields.allCases.count
+    private func saveEditModel(_ model: UserModel) {
+        UserDefaultsHelper.saveUserValue(Resources.NameFields.firstName.rawValue, model.firstName)
+        UserDefaultsHelper.saveUserValue(Resources.NameFields.secondName.rawValue, model.secondName)
+        UserDefaultsHelper.saveUserValue(Resources.NameFields.thirdName.rawValue, model.thirdName)
+        UserDefaultsHelper.saveUserValue(Resources.NameFields.dateOfBirth.rawValue, model.dateOfBirth)
+        UserDefaultsHelper.saveUserValue(Resources.NameFields.gender.rawValue, model.gender)
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: MainTableViewCell.identifier,
-                                                       for: indexPath) as? MainTableViewCell else {
-            return UITableViewCell()
+    private func getValueArray() -> [String] {
+        var valueArray = [String]()
+        for key in Resources.NameFields.allCases {
+            let value = UserDefaultsHelper.getUserValue(key.rawValue)
+            valueArray.append(value)
         }
         
-        let nameField = Resources.NameFields.allCases[indexPath.row].rawValue
-        cell.configure(name: nameField)
-        return cell
+        return valueArray
     }
+    
+    private func setValueArray() {
+        let valueArray = getValueArray()
+        mainTableView.setValueArray(valueArray)
+        mainTableView.reloadData()
+    }
+    
+    public func changeUserModel(model: UserModel) {
+        saveEditModel(model)
+        
+        userModel = model
+        setValueArray()
+//        mainTableView.reloadData()
+    }
+
 }
+
+// MARK: - setConstraints
 
 extension MainViewController {
     
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        indexPath.row == 1 ? UITableView.automaticDimension : 44
+    private func setConstraints() {
+        NSLayoutConstraint.activate([
+            mainTableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+            mainTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            mainTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+            mainTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0),
+        ])
     }
+    
 }

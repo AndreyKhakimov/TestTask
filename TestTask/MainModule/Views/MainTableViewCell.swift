@@ -42,8 +42,9 @@ final class MainTableViewCell: UITableViewCell {
         setConstraints()
     }
     
-    public func configure(name: String) {
+    public func configure(name: String, value: String) {
         nameLabel.text = name
+        valueLabel.text = value == "" ? "Нет данных" : value
     }
     
 }

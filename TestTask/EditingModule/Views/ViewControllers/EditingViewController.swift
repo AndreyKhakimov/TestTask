@@ -42,39 +42,51 @@ final class EditingViewController: UIViewController {
         
         let backBarButtonItem = UIBarButtonItem.createCustomButton(vc: self, selector: #selector(backButtonTapped))
         navigationItem.leftBarButtonItem = backBarButtonItem
+        editingTableView.setUserModel(userModel)
         view.addView(editingTableView)
     }
 
     @objc private func saveTapped() {
-        if authFields() {
-            presentSimpleAlert(title: "Saving was successful", message: "Success")
+        let editUserModel = editingTableView.getUserModel()
+        
+        if authFields(model: editUserModel) {
+            presentSimpleAlert(title: "Успешно", message: "Success")
         } else {
-            presentSimpleAlert(title: "Saving error", message: "Enter all required data")
+            presentSimpleAlert(title: "Ошибка", message: "Заполните поля ФИО")
         }
+        
     }
     
     @objc private func backButtonTapped() {
-        presentChangeAlert { value in
-            if value {
-                // TODO: send model
-                self.navigationController?.popViewController(animated: true)
-            } else {
-                self.navigationController?.popViewController(animated: true)
+        let editUserModel = editingTableView.getUserModel()
+        print(userModel)
+        print(editUserModel)
+        if editUserModel == userModel {
+            navigationController?.popViewController(animated: true)
+        } else {
+            presentChangeAlert { [weak self] value in
+                if value {
+                    guard let firstVC = self?.navigationController?.viewControllers.first as? MainViewController else { return }
+                    firstVC.changeUserModel(model: editUserModel)
+                    self?.navigationController?.popViewController(animated: true)
+                } else {
+                    self?.navigationController?.popViewController(animated: true)
+                }
             }
         }
     }
     
-    private func authFields() -> Bool {
-        if userModel.firstName != "" ||
-            userModel.secondName != "" ||
-            userModel.dateOfBirth != "" ||
-            userModel.gender != "" {
-            return true
+    private func authFields(model: UserModel) -> Bool {
+        if model.firstName == "" ||
+            model.secondName == "" ||
+            model.dateOfBirth == "" ||
+            model.gender == "" {
+            return false
         }
         
-        return false
+        return true
     }
-
+    
 }
 
 // MARK: - setConstraints
