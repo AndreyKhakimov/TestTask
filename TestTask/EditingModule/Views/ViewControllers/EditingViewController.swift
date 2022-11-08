@@ -21,6 +21,7 @@ final class EditingViewController: UIViewController {
     private let editingTableView = EditingTableView()
     
     private var userModel: UserModel
+    private var userPhotoIsChanged = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,8 +36,9 @@ final class EditingViewController: UIViewController {
         userPhotoImageView.layer.cornerRadius = userPhotoImageView.frame.width / 2
     }
     
-    init(_ userModel: UserModel) {
+    init(_ userModel: UserModel, userPhoto: UIImage?) {
         self.userModel = userModel
+        self.userPhotoImageView.image = userPhoto
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -66,7 +68,7 @@ final class EditingViewController: UIViewController {
         let editUserModel = editingTableView.getUserModel()
         
         if authFields(model: editUserModel) {
-            presentSimpleAlert(title: "Успешно", message: "Success")
+            presentSimpleAlert(title: "Успешно", message: "Сохранено")
         } else {
             presentSimpleAlert(title: "Ошибка", message: "Заполните поля ФИО")
         }
@@ -77,13 +79,17 @@ final class EditingViewController: UIViewController {
         let editUserModel = editingTableView.getUserModel()
         print(userModel)
         print(editUserModel)
-        if editUserModel == userModel {
+        if !authFields(model: editUserModel) {
+            presentSimpleAlert(title: "Ошибка", message: "Заполните поля ФИО")
+        }
+        if editUserModel == userModel && !userPhotoIsChanged {
             navigationController?.popViewController(animated: true)
         } else {
             presentChangeAlert { [weak self] value in
                 if value {
                     guard let firstVC = self?.navigationController?.viewControllers.first as? MainViewController else { return }
                     firstVC.changeUserModel(model: editUserModel)
+                    firstVC.changeUserPhoto(image: self?.userPhotoImageView.image)
                     self?.navigationController?.popViewController(animated: true)
                 } else {
                     self?.navigationController?.popViewController(animated: true)
@@ -93,7 +99,9 @@ final class EditingViewController: UIViewController {
     }
     
     private func authFields(model: UserModel) -> Bool {
-        if model.firstName == "" ||
+        if model.firstName == "Введите данные" ||
+            model.firstName == "" ||
+            model.secondName == "Введите данные"  ||
             model.secondName == "" ||
             model.dateOfBirth == "" ||
             model.gender == "" {
@@ -134,6 +142,7 @@ extension EditingViewController: UINavigationControllerDelegate, UIImagePickerCo
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         let image = info[.editedImage] as? UIImage
         userPhotoImageView.image = image
+        userPhotoIsChanged = true
         dismiss(animated: true)
     }
     
@@ -150,6 +159,7 @@ extension EditingViewController: PHPickerViewControllerDelegate {
                 DispatchQueue.main.async {
                     self.userPhotoImageView.image = image
                 }
+                self.userPhotoIsChanged = true
             }
         }
     }
